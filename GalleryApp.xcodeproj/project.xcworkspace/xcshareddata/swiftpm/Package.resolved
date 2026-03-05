@@ -1,0 +1,33 @@
+{
+  "originHash" : "003f17d761bc45ffb9b9e9c2acaf7f17b3dc829492e95f49e11614660a030a95",
+  "pins" : [
+    {
+      "identity" : "ditranquillity",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ivlevAstef/DITranquillity.git",
+      "state" : {
+        "revision" : "17ea2e1719309b084df66bca6dc04613be53a10b",
+        "version" : "5.0.0"
+      }
+    },
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "state" : {
+        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+        "version" : "5.7.1"
+      }
+    },
+    {
+      "identity" : "swiftlazy",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ivlevAstef/SwiftLazy.git",
+      "state" : {
+        "revision" : "ed594b3be371defd7a44ae1c078e91b39d78a523",
+        "version" : "1.7.0"
+      }
+    }
+  ],
+  "version" : 3
+}
