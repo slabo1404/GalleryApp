@@ -18,11 +18,11 @@ struct HeartView: View {
             .scaleEffect(isLiked ? 1.2 : 1.0)
             .shadow(color: .black.opacity(0.2), radius: 4)
             .onTapGesture {
+                generateImpactFeedback()
+                onTap(isLiked)
+                
                 withAnimation(.interactiveSpring()) {
-                    generateImpactFeedback()
-                    
                     isLiked.toggle()
-                    onTap(isLiked)
                 }
             }
     }
