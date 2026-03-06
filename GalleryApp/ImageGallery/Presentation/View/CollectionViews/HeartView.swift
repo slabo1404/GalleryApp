@@ -19,10 +19,10 @@ struct HeartView: View {
             .shadow(color: .black.opacity(0.2), radius: 4)
             .onTapGesture {
                 generateImpactFeedback()
-                onTap(isLiked)
-                
+
                 withAnimation(.interactiveSpring()) {
                     isLiked.toggle()
+                    onTap(isLiked)
                 }
             }
     }
