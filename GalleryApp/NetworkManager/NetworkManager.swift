@@ -33,6 +33,7 @@ final class NetworkManager {
             
             do {
                 let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
                 return try decoder.decode(T.self, from: data)
             } catch {
                 throw APIError.decodingFailed(error)

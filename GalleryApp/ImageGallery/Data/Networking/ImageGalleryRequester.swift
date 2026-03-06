@@ -8,7 +8,7 @@
 import Foundation
 
 enum ImageGalleryRequester {
-    case fetchPhotos(page: Int, perPage: Int)
+    case fetchPhotos(PhotoRequestDTO)
 }
 
 extension ImageGalleryRequester: Requester {
@@ -30,10 +30,10 @@ extension ImageGalleryRequester: Requester {
         }
     }
     
-    var queryItems: [String : String]? {
+    var queryItems: [URLQueryItem]? {
         switch self {
-        case let .fetchPhotos(page, perPage):
-            return ["page": "\(page)", "per_page": "\(perPage)"]
+        case .fetchPhotos(let request):
+            return request.toQueryItems()
         }
     }
     

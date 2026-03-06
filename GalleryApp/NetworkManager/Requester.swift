@@ -14,7 +14,8 @@ protocol Requester {
     var headers: HTTPHeaders? { get }
     var body: Data? { get }
     var parameters: [String: Any]? { get }
-    var queryItems: [String: String]? { get }
+    var queryParameters: [String: Any]? { get }
+    var queryItems: [URLQueryItem]? { get }
 }
 
 extension Requester {
@@ -30,7 +31,11 @@ extension Requester {
         return nil
     }
     
-    var queryItems: [String: String]? {
+    var queryParameters: [String: Any]? {
+        return nil
+    }
+    
+    var queryItems: [URLQueryItem]? {
         return nil
     }
 }
@@ -39,8 +44,12 @@ extension Requester {
     func buildRequest() throws -> URLRequest {
         var urlComponents = URLComponents(string: host + path)
         
-        if let queryItems = queryItems {
-            urlComponents?.queryItems = queryItems.map { URLQueryItem(name: $0.key, value: $0.value) }
+        if let queryParameters {
+            urlComponents?.queryItems = queryParameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
+        }
+        
+        if let queryItems {
+            urlComponents?.queryItems = queryItems
         }
         
         guard let url = urlComponents?.url else { throw APIError.invalidURL }
