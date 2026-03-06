@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct PhotoCellView: View {
-    @State var isLiked: Bool
     @State private var isPressed = false
     @State private var isImageLoaded = false
     
@@ -25,11 +24,10 @@ struct PhotoCellView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay(alignment: .topTrailing) {
                     if isImageLoaded {
-                        HeartView(isLiked: $isLiked) { isLiked in
+                        HeartView(isLiked: photo.isLiked) { isLiked in
                             onLikeTapped(isLiked)
                         }
                         .padding(8)
-                        .transition(.opacity.combined(with: .scale))
                     }
                 }
         }

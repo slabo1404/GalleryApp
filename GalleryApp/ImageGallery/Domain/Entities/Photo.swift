@@ -14,4 +14,12 @@ nonisolated struct Photo: Hashable {
     let description: String?
     let altDescription: String
     let imageUrl: String
+    var isLiked: Bool = false
+    
+    static func == (lhs: Photo, rhs: Photo) -> Bool {
+        lhs.id == rhs.id
+    }
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

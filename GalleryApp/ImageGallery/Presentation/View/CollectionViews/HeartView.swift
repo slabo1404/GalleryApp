@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HeartView: View {
-    @Binding var isLiked: Bool
+    @State var isLiked: Bool
     let onTap: (Bool) -> Void
     
     var body: some View {

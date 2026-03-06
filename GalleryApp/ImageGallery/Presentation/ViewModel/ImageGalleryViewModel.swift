@@ -15,7 +15,9 @@ protocol IImageGalleryViewModelOutput {
 protocol IImageGalleryViewModelInput {
     func fetchPhotoBatch()
     func prefetchImages(at indexes: [Int])
-    func cancelPrefetchImages(at indexes: [Int]) 
+    func cancelPrefetchImages(at indexes: [Int])
+    func saveFavouritePhoto(_ photo: Photo)
+    func deleteFavouritePhoto(id: String)
 }
 
 protocol IImageGalleryViewModel: IImageGalleryViewModelInput, IImageGalleryViewModelOutput {}
@@ -39,9 +41,16 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
     }
 
     private let fetchPhotosUseCase: IFetchPhotosUseCase
+    private let saveFavouritePhotoUseCase: ISaveFavouritePhotoUseCase
+    private let deleteFavouritePhotoUseCase: IDeleteFavouritePhotoUseCase
     
-    init(fetchPhotosUseCase: IFetchPhotosUseCase) {
+    init(fetchPhotosUseCase: IFetchPhotosUseCase,
+         saveFavouritePhotoUseCase: ISaveFavouritePhotoUseCase,
+         deleteFavouritePhotoUseCase: IDeleteFavouritePhotoUseCase
+    ) {
         self.fetchPhotosUseCase = fetchPhotosUseCase
+        self.saveFavouritePhotoUseCase = saveFavouritePhotoUseCase
+        self.deleteFavouritePhotoUseCase = deleteFavouritePhotoUseCase
     }
     
     func fetchPhotoBatch() {
@@ -70,6 +79,29 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
             Task {
                 await ImageLoader.shared.cancelLoad(urlString: photoUrl)
             }
+        }
+    }
+    
+    func saveFavouritePhoto(_ photo: Photo) {
+        saveFavouritePhotoUseCase.start(photo: photo)
+        updatePhoto(id: photo.id, isLiked: true)
+    }
+    
+    func deleteFavouritePhoto(id: String) {
+        deleteFavouritePhotoUseCase.start(id: id)
+        updatePhoto(id: id, isLiked: false)
+    }
+    
+    private func updatePhoto(id: String, isLiked: Bool) {
+        photosWithDublicates.indices.forEach { index in
+            let photo = photosWithDublicates[index]
+            if photo.id == id {
+                photosWithDublicates[index].isLiked = isLiked
+            }
+        }
+        
+        if let index = photos.firstIndex(where: { $0.id == id }) {
+            photos[index].isLiked = isLiked
         }
     }
 }

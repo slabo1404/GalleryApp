@@ -65,8 +65,7 @@ final class ImageGalleryViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
-        
-        collectionView.prefetchDataSource = self
+        setupViews()
         setupDataSource()
         bindToViewModel()
         
@@ -78,8 +77,6 @@ final class ImageGalleryViewController: UIViewController {
 
 private extension ImageGalleryViewController {
     func setupUI() {
-        navigationItem.title = "Галлерея"
-        
         view.addSubview(collectionView)
         
         collectionView.snp.makeConstraints { make in
@@ -87,15 +84,24 @@ private extension ImageGalleryViewController {
         }
     }
     
+    func setupViews() {
+        navigationItem.title = "Галлерея"
+        collectionView.prefetchDataSource = self
+    }
+    
     func setupDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Photo> { cell, _, photo in
             cell.selectedBackgroundView = UIView()
             
             cell.contentConfiguration = UIHostingConfiguration {
-                PhotoCellView(isLiked: false, photo: photo) {
+                PhotoCellView(photo: photo) {
                     print("Select photo \(photo.id)")
                 } onLikeTapped: { isLiked in
-                    print("Is liked = \(isLiked)")
+                    if isLiked {
+                        self.viewModel.saveFavouritePhoto(photo)
+                    } else {
+                        self.viewModel.deleteFavouritePhoto(id: photo.id)
+                    }
                 }
             }
         }
@@ -142,6 +148,8 @@ private extension ImageGalleryViewController {
             .store(in: &cancellable)
     }
 }
+
+// MARK: - UICollectionViewDataSourcePrefetching
 
 extension ImageGalleryViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {

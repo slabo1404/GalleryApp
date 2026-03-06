@@ -20,13 +20,12 @@ struct LoadingImageView: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             } else {
                 ProgressView()
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: image)
+        .animation(.easeIn(duration: 0.2), value: image)
         .task {
             let loadedImage = await ImageLoader.shared.loadImage(urlString: urlString)
             
