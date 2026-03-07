@@ -22,9 +22,11 @@ final class MenuTabBarController: UITabBarController {
     
     private func setupViewControllers() {
         let imageGalleryVC: ImageGalleryViewController = AppDependencyContainer.container.resolve()
+        let favouriteImageGalleryVC: FavouriteImageGalleryViewController = AppDependencyContainer.container.resolve()
         
         viewControllers = [
-            createNavigationController(root: imageGalleryVC, title: "Галлерея", icon: "text.bubble.badge.clock")
+            createNavigationController(root: imageGalleryVC, title: "Галлерея", icon: "rectangle.grid.1x3"),
+            createNavigationController(root: favouriteImageGalleryVC, title: "Любимые", icon: "heart")
         ]
     }
     

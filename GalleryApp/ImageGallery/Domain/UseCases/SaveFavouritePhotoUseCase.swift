@@ -5,6 +5,8 @@
 //  Created by Вячеслав Болбат on 6.03.26.
 //
 
+import Foundation
+
 protocol ISaveFavouritePhotoUseCase {
     func start(photo: Photo)
 }

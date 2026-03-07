@@ -10,7 +10,9 @@ import Foundation
 
 final class CoreDataStorage  {
     static let shared = CoreDataStorage()
-    private init() {}
+    private init() {
+        viewContext.automaticallyMergesChangesFromParent = true
+    }
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "GalleryApp")
@@ -21,6 +23,10 @@ final class CoreDataStorage  {
         })
         return container
     }()
+    
+    var viewContext: NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
     
     var backgroundContext: NSManagedObjectContext {
         return persistentContainer.newBackgroundContext()

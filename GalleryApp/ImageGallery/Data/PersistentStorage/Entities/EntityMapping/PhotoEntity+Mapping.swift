@@ -19,6 +19,7 @@ extension PhotoEntity {
         setValue(photo.description, forKey: "descr")
         setValue(photo.altDescription, forKey: "altDescription")
         setValue(photo.imageUrl, forKey: "imageUrl")
+        setValue(photo.imageData, forKey: "imageData")
     }
 }
 
@@ -30,7 +31,8 @@ extension PhotoEntity: DomainMappable {
             createdAt: createdAt,
             description: descr,
             altDescription: altDescription,
-            imageUrl: imageUrl
+            imageUrl: imageUrl,
+            imageData: imageData
         )
     }
 }

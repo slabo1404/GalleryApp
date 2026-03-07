@@ -5,6 +5,8 @@
 //  Created by Вячеслав Болбат on 4.03.26.
 //
 
+import Foundation
+
 protocol IImageGalleryRepository {
     func fetchPhotos(page: Int, perPage: Int) async throws -> [Photo]
     func saveFavouritePhoto(_ photo: Photo)

@@ -5,6 +5,8 @@
 //  Created by Вячеслав Болбат on 4.03.26.
 //
 
+import Foundation
+
 final class ImageGalleryRepository: IImageGalleryRepository {
     private let photoStorage: IPhotoStorage
     

@@ -10,36 +10,44 @@ import Foundation
 
 protocol IImageGalleryViewModelOutput {
     var photosPublisher: AnyPublisher<[Photo], Never> { get }
+    var updatedLikePhotoPublisher: AnyPublisher<Photo, Never> { get }
 }
 
 protocol IImageGalleryViewModelInput {
     func fetchPhotoBatch()
     func prefetchImages(at indexes: [Int])
     func cancelPrefetchImages(at indexes: [Int])
-    func saveFavouritePhoto(_ photo: Photo)
+    func saveFavouritePhoto(_ photo: Photo, imageData: Data?)
     func deleteFavouritePhoto(id: String)
 }
 
 protocol IImageGalleryViewModel: IImageGalleryViewModelInput, IImageGalleryViewModelOutput {}
 
 final class ImageGalleryViewModel: IImageGalleryViewModel {
-    @Published private var photos: [Photo] = []
+    private var photosSubject = PassthroughSubject<[Photo], Never>()
+    private var updatedLikePhotoSubject = PassthroughSubject<Photo, Never>()
+    
+    private var photos: [Photo] = []
     private var batchIndex = 0
-    private var photosWithDublicates: [Photo] = []
     private var batchLimit = 30
+    private var cancellable = Set<AnyCancellable>()
     
     private var canLoadBatch: Bool {
-        if photosWithDublicates.isEmpty {
+        if photos.isEmpty {
             return true
         }
         
-        return batchLimit == photosWithDublicates.count / batchIndex
+        return batchLimit == photos.count / batchIndex
     }
     
     var photosPublisher: AnyPublisher<[Photo], Never> {
-        $photos.eraseToAnyPublisher()
+        photosSubject.eraseToAnyPublisher()
     }
-
+    
+    var updatedLikePhotoPublisher: AnyPublisher<Photo, Never> {
+        updatedLikePhotoSubject.eraseToAnyPublisher()
+    }
+    
     private let fetchPhotosUseCase: IFetchPhotosUseCase
     private let saveFavouritePhotoUseCase: ISaveFavouritePhotoUseCase
     private let deleteFavouritePhotoUseCase: IDeleteFavouritePhotoUseCase
@@ -51,6 +59,8 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
         self.fetchPhotosUseCase = fetchPhotosUseCase
         self.saveFavouritePhotoUseCase = saveFavouritePhotoUseCase
         self.deleteFavouritePhotoUseCase = deleteFavouritePhotoUseCase
+        
+        setupNotification()
     }
     
     func fetchPhotoBatch() {
@@ -82,24 +92,36 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
         }
     }
     
-    func saveFavouritePhoto(_ photo: Photo) {
-        saveFavouritePhotoUseCase.start(photo: photo)
-        updatePhoto(id: photo.id, isLiked: true)
+    func saveFavouritePhoto(_ photo: Photo, imageData: Data?) {
+        var updatedPhoto = photo
+        updatedPhoto.imageData = imageData
+        
+        saveFavouritePhotoUseCase.start(photo: updatedPhoto)
+        updateLocalPhotos(id: photo.id, isLiked: true)
+        photosSubject.send(photos)
     }
     
     func deleteFavouritePhoto(id: String) {
         deleteFavouritePhotoUseCase.start(id: id)
-        updatePhoto(id: id, isLiked: false)
+        updateLocalPhotos(id: id, isLiked: false)
+        photosSubject.send(photos)
     }
     
-    private func updatePhoto(id: String, isLiked: Bool) {
-        photosWithDublicates.indices.forEach { index in
-            let photo = photosWithDublicates[index]
-            if photo.id == id {
-                photosWithDublicates[index].isLiked = isLiked
+    func setupNotification() {
+        NotificationCenter.default
+            .publisher(for: .updateLikeStatus)
+            .receive(on: DispatchQueue.main)
+            .compactMap { $0.object as? Photo }
+            .sink { [weak self] photo in
+                guard let self = self else { return }
+                
+                updateLocalPhotos(id: photo.id, isLiked: false)
+                updatedLikePhotoSubject.send(photo)
             }
-        }
-        
+            .store(in: &cancellable)
+    }
+    
+    private func updateLocalPhotos(id: String, isLiked: Bool) {        
         if let index = photos.firstIndex(where: { $0.id == id }) {
             photos[index].isLiked = isLiked
         }
@@ -113,8 +135,8 @@ private extension ImageGalleryViewModel {
         do {
             let batch = try await fetchPhotosUseCase.start(page: batchIndex, perPage: batchLimit)
             
-            photosWithDublicates.append(contentsOf: batch)
-            photos = photosWithDublicates.unique(by: \.id)
+            photos.append(contentsOf: batch)
+            photosSubject.send(photos.unique(by: \.id))
         } catch {
             print(error.localizedDescription)
         }

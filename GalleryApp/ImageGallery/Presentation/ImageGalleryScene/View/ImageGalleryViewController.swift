@@ -94,11 +94,11 @@ private extension ImageGalleryViewController {
             cell.selectedBackgroundView = UIView()
             
             cell.contentConfiguration = UIHostingConfiguration {
-                PhotoCellView(photo: photo) {
+                GalleryCellView(photo: photo) {
                     print("Select photo \(photo.id)")
-                } onLikeTapped: { isLiked in
+                } onLikeTapped: { isLiked, imageData in
                     if isLiked {
-                        self.viewModel.saveFavouritePhoto(photo)
+                        self.viewModel.saveFavouritePhoto(photo, imageData: imageData)
                     } else {
                         self.viewModel.deleteFavouritePhoto(id: photo.id)
                     }
@@ -144,6 +144,25 @@ private extension ImageGalleryViewController {
                 snapshot.appendSections([0])
                 snapshot.appendItems(photos)
                 self?.dataSource.apply(snapshot)
+            }
+            .store(in: &cancellable)
+        
+        viewModel.updatedLikePhotoPublisher
+            .sink { [weak self] photo in
+                guard let self = self else { return }
+                
+                var photos = self.dataSource.snapshot().itemIdentifiers
+                
+                if let index = photos.firstIndex(where: { $0.id == photo.id }) {
+                    photos[index] = photo
+                    
+                    var newSnapshot = NSDiffableDataSourceSnapshot<Int, Photo>()
+                    newSnapshot.appendSections([0])
+                    newSnapshot.appendItems(photos)
+                    newSnapshot.reloadItems([photo])
+                    
+                    self.dataSource.apply(newSnapshot, animatingDifferences: false)
+                }
             }
             .store(in: &cancellable)
     }
