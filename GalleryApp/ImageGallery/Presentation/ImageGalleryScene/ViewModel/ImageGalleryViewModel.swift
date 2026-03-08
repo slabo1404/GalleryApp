@@ -32,6 +32,10 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
     private var batchLimit = 30
     private var cancellable = Set<AnyCancellable>()
     
+    private var uniquePhotos: [Photo] {
+        photos.unique(by: \.id)
+    }
+    
     private var canLoadBatch: Bool {
         if photos.isEmpty {
             return true
@@ -98,13 +102,13 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
         
         saveFavouritePhotoUseCase.start(photo: updatedPhoto)
         updateLocalPhotos(id: photo.id, isLiked: true)
-        photosSubject.send(photos)
+        photosSubject.send(uniquePhotos)
     }
     
     func deleteFavouritePhoto(id: String) {
         deleteFavouritePhotoUseCase.start(id: id)
         updateLocalPhotos(id: id, isLiked: false)
-        photosSubject.send(photos)
+        photosSubject.send(uniquePhotos)
     }
     
     func setupNotification() {
@@ -136,7 +140,7 @@ private extension ImageGalleryViewModel {
             let batch = try await fetchPhotosUseCase.start(page: batchIndex, perPage: batchLimit)
             
             photos.append(contentsOf: batch)
-            photosSubject.send(photos.unique(by: \.id))
+            photosSubject.send(uniquePhotos)
         } catch {
             print(error.localizedDescription)
         }
