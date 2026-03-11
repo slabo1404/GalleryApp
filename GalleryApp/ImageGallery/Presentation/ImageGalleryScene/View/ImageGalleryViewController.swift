@@ -6,6 +6,7 @@
 //
 
 import Combine
+import DITranquillity
 import SnapKit
 import SwiftUI
 import UIKit
@@ -15,10 +16,22 @@ final class ImageGalleryViewController: UIViewController {
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewCompositionalLayout { index, environment in
-            var config = UICollectionLayoutListConfiguration(appearance: .plain)
-            config.footerMode = .supplementary
+            let itemSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1/3),
+                heightDimension: .fractionalHeight(1)
+            )
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 4, leading: 4, bottom: 4, trailing: 4)
             
-            let section = NSCollectionLayoutSection.list(using: config, layoutEnvironment: environment)
+            let groupSize = NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1),
+                heightDimension: .fractionalWidth(1/3)
+            )
+            
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            group.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+            
+            let section = NSCollectionLayoutSection(group: group)
             
             let footerSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
@@ -85,25 +98,21 @@ private extension ImageGalleryViewController {
     }
     
     func setupViews() {
-        navigationItem.title = "Галлерея"
+        view.backgroundColor = .clear
+        navigationItem.title = "Галерея"
         collectionView.prefetchDataSource = self
     }
     
     func setupDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Photo> { cell, _, photo in
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Photo> { cell, indexPath, photo in
             cell.selectedBackgroundView = UIView()
             
-            cell.contentConfiguration = UIHostingConfiguration {
+            cell.contentConfiguration = UIHostingConfiguration { [weak self] in
                 GalleryCellView(photo: photo) {
-                    print("Select photo \(photo.id)")
-                } onLikeTapped: { isLiked, imageData in
-                    if isLiked {
-                        self.viewModel.saveFavouritePhoto(photo, imageData: imageData)
-                    } else {
-                        self.viewModel.deleteFavouritePhoto(id: photo.id)
-                    }
+                    self?.showImageDeatailScene(with: photo)
                 }
             }
+            .margins(.all, 0)
         }
         
         let footerRegistration = UICollectionView.SupplementaryRegistration<LoaderFooterView>(
@@ -131,6 +140,19 @@ private extension ImageGalleryViewController {
             )
         }
     }
+    
+    private func showImageDeatailScene(with photo: Photo) {
+        var imageDetailViewModel: IImageDetailViewModel = AppDependencyContainer.container.resolve()
+        imageDetailViewModel.photos = viewModel.uniquePhotos
+        imageDetailViewModel.selectedPhotoId = photo.id
+        
+        let imageDetailViewController = ImageDetailViewController(
+            viewModel: imageDetailViewModel,
+            dataSource: self
+        )
+        
+        present(imageDetailViewController, animated: true)
+    }
 }
 
 // MARK: - Bindings
@@ -146,25 +168,6 @@ private extension ImageGalleryViewController {
                 self?.dataSource.apply(snapshot)
             }
             .store(in: &cancellable)
-        
-        viewModel.updatedLikePhotoPublisher
-            .sink { [weak self] photo in
-                guard let self = self else { return }
-                
-                var photos = self.dataSource.snapshot().itemIdentifiers
-                
-                if let index = photos.firstIndex(where: { $0.id == photo.id }) {
-                    photos[index] = photo
-                    
-                    var newSnapshot = NSDiffableDataSourceSnapshot<Int, Photo>()
-                    newSnapshot.appendSections([0])
-                    newSnapshot.appendItems(photos)
-                    newSnapshot.reloadItems([photo])
-                    
-                    self.dataSource.apply(newSnapshot, animatingDifferences: false)
-                }
-            }
-            .store(in: &cancellable)
     }
 }
 
@@ -177,5 +180,37 @@ extension ImageGalleryViewController: UICollectionViewDataSourcePrefetching {
     
     func collectionView(_ collectionView: UICollectionView, cancelPrefetchingForItemsAt indexPaths: [IndexPath]) {
         viewModel.cancelPrefetchImages(at: indexPaths.map { $0.item })
+    }
+}
+
+// MARK: - ImageTransitionDelegate
+
+extension ImageGalleryViewController: ImageTransitionDataSource {
+    func startImageFrameForItem(at index: Int) -> CGRect {
+        let indexPath = IndexPath(item: index, section: 0)
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return .zero
+        }
+        
+        return cell.convert(cell.contentView.frame, to: nil)
+    }
+    
+    func finalImageFrameForItem(at index: Int) -> CGRect {
+        let indexPath = IndexPath(item: index, section: 0)
+        
+        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        collectionView.layoutIfNeeded()
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return .zero
+        }
+        
+        return cell.convert(cell.contentView.frame, to: nil)
+    }
+    
+    func imageForItem(at index: Int) -> UIImage? {
+        let photo = viewModel.uniquePhotos[index]
+        return ImageLoader.shared.geImageFromCache(key: photo.imageUrl)
     }
 }

@@ -76,7 +76,7 @@ final class FavouriteImageGalleryViewController: UIViewController {
     }
 }
 
-// MARK: UI
+// MARK: - UI
 
 private extension FavouriteImageGalleryViewController {
     func setupUI() {

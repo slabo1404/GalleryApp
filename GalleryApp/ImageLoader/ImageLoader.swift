@@ -7,7 +7,7 @@
 
 import UIKit
 
-actor ImageLoader {
+final class ImageLoader {
     static let shared = ImageLoader()
     private let session: URLSession
     private let cache = NSCache<NSString, UIImage>()
@@ -16,6 +16,12 @@ actor ImageLoader {
     private init() {
         let configuration = URLSessionConfiguration.default
         session = URLSession(configuration: configuration)
+        cache.countLimit = 100
+        cache.totalCostLimit = 1024 * 1024 * 100
+    }
+    
+    func geImageFromCache(key: String) -> UIImage? {
+        getFromCache(key: key)
     }
     
     func loadImage(urlString: String) async -> UIImage? {

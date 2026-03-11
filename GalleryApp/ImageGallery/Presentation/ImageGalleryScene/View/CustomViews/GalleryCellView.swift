@@ -8,33 +8,38 @@
 import SwiftUI
 
 struct GalleryCellView: View {
-    @State private var isPressed = false
-    @State private var loadedImageData: Data?
+    @State var image: UIImage?
     
     let photo: Photo
     let onTapped: () -> Void
-    let onLikeTapped: (Bool, Data?) -> Void
     
     var body: some View {
         Button {
-            onTapped()
-        } label: {
-            LoadingImageView(urlString: photo.imageUrl) { imageData in
-                loadedImageData = imageData
+            if image != nil {
+                onTapped()
             }
-            .aspectRatio(1.2, contentMode: .fit)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .overlay(alignment: .topTrailing) {
-                if let loadedImageData {
-                    HeartView(isLiked: photo.isLiked) { isLiked in
-                        onLikeTapped(isLiked, loadedImageData)
-                    }
-                    .padding(8)
+        } label: {
+            ZStack {
+                Color(uiColor: .systemGray6)
+                
+                if let image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                } else {
+                    ProgressView()
                 }
             }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .animation(.easeOut(duration: 0.3), value: image)
         }
         .buttonStyle(ScaleButtonStyle())
-        .padding(.horizontal, 8)
-        .padding(.vertical, 2)
+        .task {
+            image = await ImageLoader.shared.loadImage(urlString: photo.imageUrl)
+        }
+        .onDisappear {
+            ImageLoader.shared.cancelLoad(urlString: photo.imageUrl)
+        }
     }
 }

@@ -28,8 +28,10 @@ final class ImageGalleryFramework: @preconcurrency DIFramework {
         container.register(FetchFavouritePhotosUseCase.init(repository:))
             .as(IFetchFavouritePhotosUseCase.self)
         
-        container.register(ImageGalleryViewModel.init(fetchPhotosUseCase:saveFavouritePhotoUseCase:deleteFavouritePhotoUseCase:))
+        container.register(ImageGalleryViewModel.init(fetchPhotosUseCase:))
             .as(IImageGalleryViewModel.self)
+        container.register(ImageDetailViewModel.init(saveFavouritePhotoUseCase:deleteFavouritePhotoUseCase:))
+            .as(IImageDetailViewModel.self)
         container.register(FavouriteImageGalleryViewModel.init(deleteFavouritePhotoUseCase:))
             .as(IFavouriteImageGalleryViewModel.self)
         

@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct FavouriteCellView: View {
+    @Environment(\.verticalSizeClass) var verticalSizeClass
+    
     var imageData: Data?
+    
+    private var isLandscape: Bool {
+        return verticalSizeClass == .compact
+    }
     
     private var uiImage: UIImage? {
         guard let imageData else { return nil }
@@ -21,12 +27,12 @@ struct FavouriteCellView: View {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             } else {
                 Color(uiColor: .systemGray6)
             }
         }
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-        .aspectRatio(1.2, contentMode: .fit)
+        .aspectRatio(isLandscape ? 2 : 1, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal, 8)
         .padding(.vertical, 2)
