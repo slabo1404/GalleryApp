@@ -21,6 +21,7 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.tintColor = UIColor.red
         imageView.alpha = 0
         return imageView
     }()
@@ -29,11 +30,42 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.hidesWhenStopped = true
         return indicator
-    } ()
+    }()
+    
+    private lazy var likeButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.tintColor = UIColor.red
+        button.setBackgroundImage(UIImage(systemName: "heart"), for: .normal)
+        button.alpha = 0
+        
+        let action = UIAction { [weak self] _ in
+            let isLiked = self?.photo?.isLiked ?? false
+            self?.configureLikeButton(isLiked: !isLiked)
+            
+            let imageData = self?.imageView.image?.pngData()
+            self?.onLikeTapped?(imageData, !isLiked)
+        }
+        
+        button.addAction(action, for: .touchUpInside)
+        
+        return button
+    }()
     
     // MARK: - Private properties
     
     private var imageURL: String?
+    
+    // MARK: - Public properties
+    
+    var onLikeTapped: ((Data?, Bool) -> Void)?
+    
+    var photo: Photo? {
+        didSet {
+            guard let photo else { return }
+            
+            configure(with: photo)
+        }
+    }
     
     // MARK: - Inits
     
@@ -50,6 +82,7 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(containerView)
         containerView.addSubview(imageView)
         containerView.addSubview(loader)
+        containerView.addSubview(likeButton)
         
         containerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -62,26 +95,25 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         loader.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
+        
+        likeButton.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(80)
+            make.leading.equalToSuperview().offset(24)
+            make.width.height.equalTo(28)
+        }
     }
     
-    // MARK: - Overriden
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
+    private func configure(with photo: Photo) {
+        configureLikeButton(isLiked: photo.isLiked)
         
-        if let imageURL {
-            ImageLoader.shared.cancelLoad(urlString: imageURL)
+        if imageURL == photo.imageUrl && imageView.image != nil {
+            return
         }
         
-        imageView.image = nil
-        imageView.alpha = 0
-        loader.stopAnimating()
-    }
-    
-    func configure(with photo: Photo) {
         imageURL = photo.imageUrl
         imageView.image = nil
         imageView.alpha = 0
+        likeButton.alpha = 0
         loader.startAnimating()
         
         Task {
@@ -92,7 +124,15 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
             
             UIView.animate(withDuration: 0.3) {
                 self.imageView.alpha = 1
+                self.likeButton.alpha = 1
             }
         }
+    }
+    
+    private func configureLikeButton(isLiked: Bool) {
+        let image = isLiked
+        ? UIImage(systemName: "heart.fill")
+        : UIImage(systemName: "heart")
+        likeButton.setBackgroundImage(image, for: .normal)
     }
 }

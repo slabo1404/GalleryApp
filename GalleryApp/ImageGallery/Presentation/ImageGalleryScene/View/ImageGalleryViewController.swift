@@ -98,7 +98,7 @@ private extension ImageGalleryViewController {
     }
     
     func setupViews() {
-        view.backgroundColor = .clear
+        view.backgroundColor = UIColor.white
         navigationItem.title = "Галерея"
         collectionView.prefetchDataSource = self
     }

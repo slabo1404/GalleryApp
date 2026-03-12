@@ -40,12 +40,10 @@ final class ImageDismissalInteractor: UIPercentDrivenInteractiveTransition {
 
             UIView.animate(withDuration: 0.1) {
                 self.presentedViewController?.view.transform = CGAffineTransform(scaleX: scale, y: scale)
-//                self.presentedViewController?.view.layer.cornerRadius = 12
             }
         case .ended, .cancelled:
             UIView.animate(withDuration: 0.1) {
                 self.presentedViewController?.view.transform = CGAffineTransform.identity
-//                self.presentedViewController?.view.layer.cornerRadius = 0
             }
         default:
             break

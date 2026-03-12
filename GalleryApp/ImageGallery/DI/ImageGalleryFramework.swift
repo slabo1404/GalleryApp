@@ -25,9 +25,6 @@ final class ImageGalleryFramework: @preconcurrency DIFramework {
         container.register(DeleteFavouritePhotoUseCase.init(repository:))
             .as(IDeleteFavouritePhotoUseCase.self)
         
-        container.register(FetchFavouritePhotosUseCase.init(repository:))
-            .as(IFetchFavouritePhotosUseCase.self)
-        
         container.register(ImageGalleryViewModel.init(fetchPhotosUseCase:))
             .as(IImageGalleryViewModel.self)
         container.register(ImageDetailViewModel.init(saveFavouritePhotoUseCase:deleteFavouritePhotoUseCase:))

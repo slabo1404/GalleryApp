@@ -13,7 +13,6 @@ extension PhotoEntity {
         self.init(context: context)
         
         setValue(photo.id, forKey: "id")
-        setValue(photo.id, forKey: "id")
         setValue(photo.slug, forKey: "slug")
         setValue(photo.createdAt, forKey: "createdAt")
         setValue(photo.description, forKey: "descr")

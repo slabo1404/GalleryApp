@@ -42,14 +42,6 @@ final class ImageDetailViewController: UIViewController {
         return collectionView
     }()
     
-    private let likeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.tintColor = UIColor.red
-        button.setBackgroundImage(UIImage(systemName: "heart"), for: .normal)
-        
-        return button
-    }()
-    
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setBackgroundImage(UIImage(systemName: "xmark"), for: .normal)
@@ -127,9 +119,12 @@ private extension ImageDetailViewController {
     }
     
     func setupDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<ImageDetailCollectionViewCell, Photo> { cell, indexPath, photo in
+        let cellRegistration = UICollectionView.CellRegistration<ImageDetailCollectionViewCell, Photo> { [weak self] cell, indexPath, photo in
             cell.selectedBackgroundView = UIView()
-            cell.configure(with: photo)
+            cell.photo = photo
+            cell.onLikeTapped = { [weak self] imageData, isLiked in
+                self?.viewModel.updateFavouritePhoto(photo: photo, imageData: imageData, isLiked: isLiked)
+            }
         }
         
         dataSource = UICollectionViewDiffableDataSource<Int, Photo>(collectionView: collectionView) { collectionView, indexPath, photo in
@@ -162,6 +157,25 @@ extension ImageDetailViewController {
                 self?.dataSource.apply(snapshot)
                 
                 self?.scrollToSelectedPhoto()
+            }
+            .store(in: &cancellable)
+        
+        viewModel.updatedLikePhotoPublisher
+            .sink { [weak self] photo in
+                guard let self else { return }
+                
+                var photos = self.dataSource.snapshot().itemIdentifiers
+                
+                if let index = photos.firstIndex(where: { $0.id == photo.id }) {
+                    photos[index] = photo
+                    
+                    var newSnapshot = NSDiffableDataSourceSnapshot<Int, Photo>()
+                    newSnapshot.appendSections([0])
+                    newSnapshot.appendItems(photos)
+                    newSnapshot.reconfigureItems([photo])
+                    
+                    self.dataSource.apply(newSnapshot, animatingDifferences: false)
+                }
             }
             .store(in: &cancellable)
     }

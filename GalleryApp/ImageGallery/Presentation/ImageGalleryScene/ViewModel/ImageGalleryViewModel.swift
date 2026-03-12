@@ -6,6 +6,7 @@
 //
 
 import Combine
+import CoreData
 import Foundation
 
 protocol IImageGalleryViewModelOutput {
@@ -50,6 +51,8 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
     
     init(fetchPhotosUseCase: IFetchPhotosUseCase) {
         self.fetchPhotosUseCase = fetchPhotosUseCase
+        
+        setupNotification()
     }
     
     func fetchPhotoBatch() {
@@ -77,6 +80,27 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
             let photoUrl = photos[index].imageUrl
             
             ImageLoader.shared.cancelLoad(urlString: photoUrl)
+        }
+    }
+    
+    func setupNotification() {
+        NotificationCenter.default
+            .publisher(for: .updateLikeStatus, object: nil)
+            .sink { [weak self] notification in
+                if let photo = notification.object as? Photo {
+                    self?.updatelocalPhotoStorage(isLiked: photo.isLiked, photoID: photo.id)
+                }
+            }
+            .store(in: &cancellable)
+    }
+    
+    func updatelocalPhotoStorage(isLiked: Bool, photoID: String) {
+        if let index = photos.firstIndex(where: { $0.id == photoID }) {
+            var updatedPhoto = photos[index]
+            updatedPhoto.isLiked = isLiked
+            
+            photos[index] = updatedPhoto
+            photosSubject.send(uniquePhotos)
         }
     }
 }

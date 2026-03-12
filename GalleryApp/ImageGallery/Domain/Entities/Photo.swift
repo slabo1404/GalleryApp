@@ -18,7 +18,7 @@ nonisolated struct Photo: Hashable {
     var imageData: Data?
     
     static func == (lhs: Photo, rhs: Photo) -> Bool {
-        lhs.id == rhs.id
+        return lhs.id == rhs.id && lhs.isLiked == rhs.isLiked
     }
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)

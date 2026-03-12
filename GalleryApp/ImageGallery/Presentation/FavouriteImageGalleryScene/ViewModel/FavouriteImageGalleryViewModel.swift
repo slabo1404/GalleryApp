@@ -8,7 +8,7 @@
 import Foundation
 
 protocol IFavouriteImageGalleryViewModelInput {
-    func deleteFavouritePhoto(id: String)
+    func deleteFavouritePhoto(photo: Photo)
 }
 
 protocol IFavouriteImageGalleryViewModel: IFavouriteImageGalleryViewModelInput {}
@@ -20,8 +20,10 @@ final class FavouriteImageGalleryViewModel: IFavouriteImageGalleryViewModel {
         self.deleteFavouritePhotoUseCase = deleteFavouritePhotoUseCase
     }
     
-    func deleteFavouritePhoto(id: String) {
-        deleteFavouritePhotoUseCase.start(id: id)
+    func deleteFavouritePhoto(photo: Photo) {
+        deleteFavouritePhotoUseCase.start(id: photo.id)
+        
+        NotificationCenter.default.post(name: .updateLikeStatus, object: photo, userInfo: nil)
     }
     
 }

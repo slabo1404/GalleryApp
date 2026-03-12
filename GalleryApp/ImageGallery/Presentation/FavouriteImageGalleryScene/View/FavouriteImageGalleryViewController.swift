@@ -21,8 +21,7 @@ final class FavouriteImageGalleryViewController: UIViewController {
                 let deleteAction = UIContextualAction(style: .destructive, title: "") { [weak self] action, view, completion in
                     guard let photo = self?.dataSource.itemIdentifier(for: indexPath) else { return }
                     
-                    self?.viewModel.deleteFavouritePhoto(id: photo.id)
-                    NotificationCenter.default.post(name: .updateLikeStatus, object: photo, userInfo: nil)
+                    self?.viewModel.deleteFavouritePhoto(photo: photo)
                 }
                 deleteAction.image = UIImage(systemName: "trash")
                 

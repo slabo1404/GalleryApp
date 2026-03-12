@@ -13,23 +13,26 @@ protocol IImageDetailViewModelOutput {
     var selectedPhotoId: String? { get set }
     
     var photosPublisher: AnyPublisher<[Photo], Never> { get }
+    var updatedLikePhotoPublisher: AnyPublisher<Photo, Never> { get }
 }
 
 protocol IImageDetailViewModelInput {
-    func saveFavouritePhoto(_ photo: Photo, imageData: Data?)
-    func deleteFavouritePhoto(id: String)
+    func updateFavouritePhoto(photo: Photo, imageData: Data?, isLiked: Bool)
 }
 
 protocol IImageDetailViewModel: IImageDetailViewModelInput, IImageDetailViewModelOutput {}
 
 final class ImageDetailViewModel: IImageDetailViewModel {
     @Published var photos: [Photo] = []
+    private var updatedLikePhotoSubject = PassthroughSubject<Photo, Never>()
     var selectedPhotoId: String?
     
     private let saveFavouritePhotoUseCase: ISaveFavouritePhotoUseCase
     private let deleteFavouritePhotoUseCase: IDeleteFavouritePhotoUseCase
     
-    init(saveFavouritePhotoUseCase: ISaveFavouritePhotoUseCase, deleteFavouritePhotoUseCase: IDeleteFavouritePhotoUseCase) {
+    init(saveFavouritePhotoUseCase: ISaveFavouritePhotoUseCase,
+         deleteFavouritePhotoUseCase: IDeleteFavouritePhotoUseCase
+    ) {
         self.saveFavouritePhotoUseCase = saveFavouritePhotoUseCase
         self.deleteFavouritePhotoUseCase = deleteFavouritePhotoUseCase
     }
@@ -38,24 +41,23 @@ final class ImageDetailViewModel: IImageDetailViewModel {
         $photos.eraseToAnyPublisher()
     }
     
-    func saveFavouritePhoto(_ photo: Photo, imageData: Data?) {
+    var updatedLikePhotoPublisher: AnyPublisher<Photo, Never> {
+        updatedLikePhotoSubject.eraseToAnyPublisher()
+    }
+    
+    func updateFavouritePhoto(photo: Photo, imageData: Data?, isLiked: Bool) {
         var updatedPhoto = photo
+        updatedPhoto.isLiked = isLiked
         updatedPhoto.imageData = imageData
         
-        saveFavouritePhotoUseCase.start(photo: updatedPhoto)
-        updateLocalPhotos(id: photo.id, isLiked: true)
-        //        photosSubject.send(uniquePhotos)
-    }
-    
-    func deleteFavouritePhoto(id: String) {
-        deleteFavouritePhotoUseCase.start(id: id)
-        updateLocalPhotos(id: id, isLiked: false)
-        //        photosSubject.send(uniquePhotos)
-    }
-    
-    private func updateLocalPhotos(id: String, isLiked: Bool) {
-        if let index = photos.firstIndex(where: { $0.id == id }) {
-            photos[index].isLiked = isLiked
+        if isLiked {
+            saveFavouritePhotoUseCase.start(photo: updatedPhoto)
+        } else {
+            deleteFavouritePhotoUseCase.start(id: photo.id)
         }
+        
+        NotificationCenter.default.post(name: .updateLikeStatus, object: updatedPhoto)
+        
+        updatedLikePhotoSubject.send(updatedPhoto)
     }
 }
