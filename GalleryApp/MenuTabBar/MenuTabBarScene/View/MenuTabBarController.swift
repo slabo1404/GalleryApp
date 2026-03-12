@@ -25,7 +25,7 @@ final class MenuTabBarController: UITabBarController {
         let favouriteImageGalleryVC: FavouriteImageGalleryViewController = AppDependencyContainer.container.resolve()
         
         viewControllers = [
-            createNavigationController(root: imageGalleryVC, title: "Галерея", icon: "rectangle.grid.1x3"),
+            createNavigationController(root: imageGalleryVC, title: "Галерея", icon: "square.grid.2x2"),
             createNavigationController(root: favouriteImageGalleryVC, title: "Любимые", icon: "heart")
         ]
     }

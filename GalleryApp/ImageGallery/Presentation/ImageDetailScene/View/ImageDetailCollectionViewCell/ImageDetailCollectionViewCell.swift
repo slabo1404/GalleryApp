@@ -26,6 +26,14 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         return imageView
     }()
     
+    private let descriptionLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textColor = UIColor.white
+        label.alpha = 0
+        return label
+    }()
+    
     private let loader: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .medium)
         indicator.hidesWhenStopped = true
@@ -83,6 +91,7 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         containerView.addSubview(imageView)
         containerView.addSubview(loader)
         containerView.addSubview(likeButton)
+        containerView.addSubview(descriptionLabel)
         
         containerView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -101,6 +110,12 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
             make.leading.equalToSuperview().offset(24)
             make.width.height.equalTo(28)
         }
+        
+        descriptionLabel.snp.makeConstraints { make in
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalToSuperview().offset(-16)
+            make.bottom.equalTo(-16)
+        }
     }
     
     private func configure(with photo: Photo) {
@@ -110,10 +125,12 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
             return
         }
         
+        descriptionLabel.text = photo.description ?? photo.altDescription
         imageURL = photo.imageUrl
         imageView.image = nil
         imageView.alpha = 0
         likeButton.alpha = 0
+        descriptionLabel.alpha = 0
         loader.startAnimating()
         
         Task {
@@ -125,6 +142,7 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
             UIView.animate(withDuration: 0.3) {
                 self.imageView.alpha = 1
                 self.likeButton.alpha = 1
+                self.descriptionLabel.alpha = 1
             }
         }
     }
