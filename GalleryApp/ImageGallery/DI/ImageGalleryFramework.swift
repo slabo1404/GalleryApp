@@ -35,6 +35,4 @@ final class ImageGalleryFramework: @preconcurrency DIFramework {
         container.register(ImageGalleryViewController.init(viewModel:))
         container.register(FavouriteImageGalleryViewController.init(viewModel:))
     }
-    
-    
 }

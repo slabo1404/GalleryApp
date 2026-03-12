@@ -25,7 +25,7 @@ final class ImageLoader {
     }
     
     func loadImage(urlString: String) async -> UIImage? {
-        if let cachedImage = getFromCache(key: urlString){
+        if let cachedImage = getFromCache(key: urlString) {
             return cachedImage
         }
         

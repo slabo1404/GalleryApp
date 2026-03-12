@@ -9,7 +9,6 @@
 public import Foundation
 public import CoreData
 
-
 public typealias PhotoEntityCoreDataPropertiesSet = NSSet
 
 extension PhotoEntity {
@@ -28,6 +27,4 @@ extension PhotoEntity {
 
 }
 
-extension PhotoEntity : Identifiable {
-
-}
+extension PhotoEntity: Identifiable {}

@@ -39,7 +39,7 @@ final class MenuTabBarController: UITabBarController {
         appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
         
         appearance.shadowImage = nil
-        appearance.shadowColor = nil 
+        appearance.shadowColor = nil
         
         nav.navigationBar.standardAppearance = appearance
         nav.navigationBar.scrollEdgeAppearance = appearance

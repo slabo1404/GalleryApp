@@ -120,6 +120,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F9C0A0FB2F584B6D00EC331F /* Build configuration list for PBXNativeTarget "GalleryApp" */;
 			buildPhases = (
+				F925BDB12F62F434009C6473 /* SwiftLint */,
 				F9C0A0E12F584B6C00EC331F /* Sources */,
 				F9C0A0E22F584B6C00EC331F /* Frameworks */,
 				F9C0A0E32F584B6C00EC331F /* Resources */,
@@ -171,6 +172,7 @@
 			packageReferences = (
 				F9C0A2872F58646800EC331F /* XCRemoteSwiftPackageReference "DITranquillity" */,
 				F9C0A2A82F58976F00EC331F /* XCRemoteSwiftPackageReference "SnapKit" */,
+				F925BDDB2F62FFF1009C6473 /* XCRemoteSwiftPackageReference "SwiftLint" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F9C0A0E62F584B6C00EC331F /* Products */;
@@ -199,6 +201,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F925BDB12F62F434009C6473 /* SwiftLint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = SwiftLint;
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "alias swiftlint=\"/opt/homebrew/bin/swiftlint\"\nif swiftlint >/dev/null; then  \n   swiftlint\nelse   \n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\" \nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F925BB692F62C21D009C6473 /* Sources */ = {
@@ -277,6 +301,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VTRTN26K76;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GalleryApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -315,6 +340,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VTRTN26K76;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GalleryApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -498,6 +524,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		F925BDDB2F62FFF1009C6473 /* XCRemoteSwiftPackageReference "SwiftLint" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/SwiftLint";
+			requirement = {
+				kind = exactVersion;
+				version = 0.63.2;
+			};
+		};
 		F9C0A2872F58646800EC331F /* XCRemoteSwiftPackageReference "DITranquillity" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ivlevAstef/DITranquillity.git";

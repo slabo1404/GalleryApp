@@ -15,7 +15,7 @@ final class ImageGalleryViewController: UIViewController {
     // MARK: - Views
     
     private let collectionView: UICollectionView = {
-        let layout = UICollectionViewCompositionalLayout { index, environment in
+        let layout = UICollectionViewCompositionalLayout { _, _ in
             let itemSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1/3),
                 heightDimension: .fractionalHeight(1)
@@ -104,7 +104,7 @@ private extension ImageGalleryViewController {
     }
     
     func setupDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Photo> { cell, indexPath, photo in
+        let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Photo> { cell, _, photo in
             cell.selectedBackgroundView = UIView()
             
             cell.contentConfiguration = UIHostingConfiguration { [weak self] in
@@ -117,9 +117,11 @@ private extension ImageGalleryViewController {
         
         let footerRegistration = UICollectionView.SupplementaryRegistration<LoaderFooterView>(
             elementKind: UICollectionView.elementKindSectionFooter
-        ) { footerView, elementKind, indexPath in }
+        ) { _, _, _ in }
         
-        dataSource = UICollectionViewDiffableDataSource<Int, Photo>(collectionView: collectionView) { [weak self] collectionView, indexPath, photo in
+        dataSource = UICollectionViewDiffableDataSource<Int, Photo>(
+            collectionView: collectionView
+        ) { [weak self] collectionView, indexPath, photo in
             
             let items = collectionView.numberOfItems(inSection: indexPath.section)
             if indexPath.item == items - 5 {
@@ -133,7 +135,7 @@ private extension ImageGalleryViewController {
             )
         }
         
-        dataSource.supplementaryViewProvider = { (collectionView, kind, indexPath) in
+        dataSource.supplementaryViewProvider = { (collectionView, _, indexPath) in
             collectionView.dequeueConfiguredReusableSupplementary(
                 using: footerRegistration,
                 for: indexPath

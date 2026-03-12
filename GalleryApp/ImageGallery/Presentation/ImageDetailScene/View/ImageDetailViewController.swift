@@ -13,7 +13,7 @@ final class ImageDetailViewController: UIViewController {
     // MARK: - Views
     
     private let collectionView: UICollectionView = {
-        let layout = UICollectionViewCompositionalLayout { index, environment in
+        let layout = UICollectionViewCompositionalLayout { _, _ in
             let itemSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
                 heightDimension: .fractionalHeight(1)
@@ -119,7 +119,8 @@ private extension ImageDetailViewController {
     }
     
     func setupDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<ImageDetailCollectionViewCell, Photo> { [weak self] cell, indexPath, photo in
+        // swiftlint:disable:next line_length
+        let cellRegistration = UICollectionView.CellRegistration<ImageDetailCollectionViewCell, Photo> { [weak self] cell, _, photo in
             cell.selectedBackgroundView = UIView()
             cell.photo = photo
             cell.onLikeTapped = { [weak self] imageData, isLiked in
@@ -127,7 +128,9 @@ private extension ImageDetailViewController {
             }
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Int, Photo>(collectionView: collectionView) { collectionView, indexPath, photo in
+        dataSource = UICollectionViewDiffableDataSource<Int, Photo>(
+            collectionView: collectionView
+        ) { collectionView, indexPath, photo in
             collectionView.dequeueConfiguredReusableCell(
                 using: cellRegistration,
                 for: indexPath,

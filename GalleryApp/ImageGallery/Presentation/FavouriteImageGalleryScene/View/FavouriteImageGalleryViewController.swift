@@ -12,13 +12,13 @@ import UIKit
 
 final class FavouriteImageGalleryViewController: UIViewController {
     private lazy var collectionView: UICollectionView = {
-        let layout = UICollectionViewCompositionalLayout { [weak self] index, environment in
+        let layout = UICollectionViewCompositionalLayout { [weak self] _, environment in
             var config = UICollectionLayoutListConfiguration(appearance: .plain)
             
             let itemsCount = self?.dataSource?.snapshot().numberOfItems ?? 0
             config.footerMode = .supplementary
             config.trailingSwipeActionsConfigurationProvider = { indexPath in
-                let deleteAction = UIContextualAction(style: .destructive, title: "") { [weak self] action, view, completion in
+                let deleteAction = UIContextualAction(style: .destructive, title: "") { [weak self] _, _, _ in
                     guard let photo = self?.dataSource.itemIdentifier(for: indexPath) else { return }
                     
                     self?.viewModel.deleteFavouritePhoto(photo: photo)
@@ -101,13 +101,15 @@ private extension FavouriteImageGalleryViewController {
         
         let footerRegistration = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(
             elementKind: UICollectionView.elementKindSectionFooter
-        ) { [weak self] footerView, elementKind, indexPath in
+        ) { [weak self] footerView, _, _ in
             let isEmpty = self?.dataSource.snapshot().numberOfItems == 0
 
             self?.configureFooterView(footerView, isEmpty: isEmpty)
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Int, Photo>(collectionView: collectionView) { collectionView, indexPath, photo in
+        dataSource = UICollectionViewDiffableDataSource<Int, Photo>(
+            collectionView: collectionView
+        ) { collectionView, indexPath, photo in
             collectionView.dequeueConfiguredReusableCell(
                 using: cellRegistration,
                 for: indexPath,
@@ -160,7 +162,9 @@ extension FavouriteImageGalleryViewController: NSFetchedResultsControllerDelegat
         snapshot.appendItems(photos)
         
         dataSource.apply(snapshot, animatingDifferences: true) { [weak self] in
-            if let footerView = self?.collectionView.visibleSupplementaryViews(ofKind: UICollectionView.elementKindSectionFooter).first as? UICollectionViewListCell {
+            if let footerView = self?.collectionView.visibleSupplementaryViews(
+                ofKind: UICollectionView.elementKindSectionFooter
+            ).first as? UICollectionViewListCell {
                 
                 self?.configureFooterView(footerView, isEmpty: photos.isEmpty)
             }

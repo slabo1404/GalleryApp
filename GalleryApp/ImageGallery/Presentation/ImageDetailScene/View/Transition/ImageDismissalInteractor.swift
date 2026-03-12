@@ -24,7 +24,7 @@ final class ImageDismissalInteractor: UIPercentDrivenInteractiveTransition {
     }
 
     @objc func handleGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
-        let translationY = gestureRecognizer.translation(in: gestureRecognizer.view!.superview!).y
+        let translationY = gestureRecognizer.translation(in: gestureRecognizer.view?.superview).y
         
         let threshold: CGFloat = 400
         let progress = min(max(translationY / threshold, 0), 1)
@@ -56,7 +56,7 @@ final class ImageDismissalInteractor: UIPercentDrivenInteractiveTransition {
 extension ImageDismissalInteractor: UIGestureRecognizerDelegate {
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         if let gesture = gestureRecognizer as? UIPanGestureRecognizer {
-            let velocity = gesture.velocity(in: gesture.view!).y
+            let velocity = gesture.velocity(in: gesture.view).y
             
             return velocity > 0
         }

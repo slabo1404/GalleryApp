@@ -8,7 +8,7 @@
 import CoreData
 import Foundation
 
-final class CoreDataStorage  {
+final class CoreDataStorage {
     static let shared = CoreDataStorage()
     private init() {
         viewContext.automaticallyMergesChangesFromParent = true
@@ -16,7 +16,7 @@ final class CoreDataStorage  {
     
     lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "GalleryApp")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+        container.loadPersistentStores(completionHandler: { (_, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
             }
@@ -32,7 +32,7 @@ final class CoreDataStorage  {
         return persistentContainer.newBackgroundContext()
     }
     
-    func saveContext () {
+    func saveContext() {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {

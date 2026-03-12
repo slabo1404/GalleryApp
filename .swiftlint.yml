@@ -1,0 +1,71 @@
+disabled_rules:
+  - force_cast
+  - multiple_closures_with_trailing_closure
+  - force_try
+  - trailing_whitespace
+  - empty_enum_arguments
+  - void_function_in_ternary
+  - discouraged_optional_boolean
+opt_in_rules:
+  - closure_spacing
+  - discouraged_optional_boolean
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - yoda_condition
+analyzer_rules:
+  - explicit_self
+  - unused_import
+included:
+  - GalleryApp
+warning_threshold: 99 #temporary value while redesign and refactoring
+file_length: 2000 #temporary 100 but should be 200
+identifier_name:
+  min_length: 3
+  max_length: 50
+  excluded: 
+    - id
+    - qr
+    - l
+    - m
+    - q
+    - h
+    - to
+    - in
+    - up
+cyclomatic_complexity:
+  ignores_case_statements: true
+  warning: 100 #temporary 100 but should be 3-5 (or by default)
+  error: 101 #temporary 101 but should be 5-8 (or by default)
+function_body_length:
+  warning: 1000 #temporary 1000 but should be 40
+  error: 2000 #temporary 2000 but should be 100
+function_parameter_count:
+  warning: 10
+  error: 15
+nesting:
+  type_level: 3
+large_tuple:
+  warning: 4
+  error: 5
+line_length:
+  warning: 130
+  error: 300
+  ignores_urls: true
+  ignores_function_declarations: true
+  ignores_comments: true
+  ignores_interpolated_strings: true
+type_body_length:
+  warning: 3000 #temporary 3000 but should be less
+  error: 4000 #temporary 4000 but should be less
+type_name:
+  max_length: 50
+reporter: "xcode"
+
+custom_rules:
+  cell_identifier_name:
+    name: "Error cell identifier"
+    message: "Cell identifier should not be \"cell\""
+    regex: '"(c|C)ell"'
+    severity: warning
+

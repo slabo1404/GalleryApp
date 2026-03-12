@@ -28,7 +28,7 @@ final class ImagePresentationController: UIPresentationController {
 
     override func containerViewWillLayoutSubviews() {
         super.containerViewWillLayoutSubviews()
-        visualEffectView.frame = containerView!.frame
+        visualEffectView.frame = containerView?.frame ?? .zero
     }
 
     override func dismissalTransitionWillBegin() {

@@ -34,6 +34,10 @@ final class LoaderFooterView: UICollectionReusableView {
     }
     
     func setLoading(_ isLoading: Bool) {
-        isLoading ? activityIndicator.startAnimating() : activityIndicator.stopAnimating()
+        if isLoading {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
+        }
     }
 }

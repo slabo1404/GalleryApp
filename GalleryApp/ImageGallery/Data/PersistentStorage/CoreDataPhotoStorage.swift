@@ -16,7 +16,7 @@ extension CoreDataPhotoStorage: IPhotoStorage {
     func save(photo: Photo) {
         storage.performBackgroundTask { context in
             do {
-                let _ = PhotoEntity(photo: photo, context: context)
+                _ = PhotoEntity(photo: photo, context: context)
                 try context.save()
                 
             } catch {
