@@ -5,6 +5,7 @@
 //  Created by Вячеслав Болбат on 11.03.26.
 //
 
+import Lottie
 import SnapKit
 import UIKit
 
@@ -40,23 +41,14 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         return indicator
     }()
     
-    private lazy var likeButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.tintColor = UIColor.red
-        button.setBackgroundImage(UIImage(systemName: "heart"), for: .normal)
-        button.alpha = 0
-        
-        let action = UIAction { [weak self] _ in
-            let isLiked = self?.photo?.isLiked ?? false
-            self?.configureLikeButton(isLiked: !isLiked)
-            
-            let imageData = self?.imageView.image?.pngData()
-            self?.onLikeTapped?(imageData, !isLiked)
-        }
-        
-        button.addAction(action, for: .touchUpInside)
-        
-        return button
+    private let likeAnimationView: LottieAnimationView = {
+        let animationView = LottieAnimationView()
+        let likePath = Bundle.main.path(forResource: "animate_like", ofType: "json") ?? ""
+        animationView.animation = LottieAnimation.filepath(likePath)
+        animationView.contentMode = .scaleAspectFit
+        animationView.animationSpeed = 2
+        animationView.alpha = 0
+        return animationView
     }()
     
     // MARK: - Private properties
@@ -79,7 +71,9 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
         setupUI()
+        setupViews()
     }
     
     required init?(coder: NSCoder) {
@@ -90,7 +84,7 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(containerView)
         containerView.addSubview(imageView)
         containerView.addSubview(loader)
-        containerView.addSubview(likeButton)
+        containerView.addSubview(likeAnimationView)
         containerView.addSubview(descriptionLabel)
         
         containerView.snp.makeConstraints { make in
@@ -105,10 +99,10 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
             make.center.equalToSuperview()
         }
         
-        likeButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(80)
-            make.leading.equalToSuperview().offset(24)
-            make.width.height.equalTo(28)
+        likeAnimationView.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(32)
+            make.leading.equalToSuperview().offset(12)
+            make.width.height.equalTo(100)
         }
         
         descriptionLabel.snp.makeConstraints { make in
@@ -118,18 +112,22 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    private func setupViews() {
+        let tapViewGesture = UITapGestureRecognizer(target: self, action: #selector(didPressLike))
+        likeAnimationView.addGestureRecognizer(tapViewGesture)
+    }
+    
     private func configure(with photo: Photo) {
-        configureLikeButton(isLiked: photo.isLiked)
-        
         if imageURL == photo.imageUrl && imageView.image != nil {
             return
         }
         
+        likeAnimationView.currentProgress = photo.isLiked ? 0.5 : 1
         descriptionLabel.text = photo.description ?? photo.altDescription
         imageURL = photo.imageUrl
         imageView.image = nil
         imageView.alpha = 0
-        likeButton.alpha = 0
+        likeAnimationView.alpha = 0
         descriptionLabel.alpha = 0
         loader.startAnimating()
         
@@ -141,16 +139,35 @@ final class ImageDetailCollectionViewCell: UICollectionViewCell {
             
             UIView.animate(withDuration: 0.3) {
                 self.imageView.alpha = 1
-                self.likeButton.alpha = 1
+                self.likeAnimationView.alpha = 1
                 self.descriptionLabel.alpha = 1
             }
         }
     }
-    
-    private func configureLikeButton(isLiked: Bool) {
-        let image = isLiked
-        ? UIImage(systemName: "heart.fill")
-        : UIImage(systemName: "heart")
-        likeButton.setBackgroundImage(image, for: .normal)
+}
+
+// MARK: - Events
+
+extension ImageDetailCollectionViewCell {
+    @objc func didPressLike() {
+        guard let photo else { return }
+        
+        let generator = UIImpactFeedbackGenerator(style: .soft)
+        generator.prepare()
+        generator.impactOccurred()
+        
+        let fromProgress: CGFloat = photo.isLiked ? 0.5 : 0
+        let toProgress: CGFloat = photo.isLiked ? 1 : 0.5
+        
+        let isLiked = photo.isLiked
+        
+        let imageData = imageView.image?.pngData()
+        onLikeTapped?(imageData, !isLiked)
+        
+        likeAnimationView.play(
+            fromProgress: fromProgress,
+            toProgress: toProgress,
+            loopMode: .playOnce
+        )
     }
 }

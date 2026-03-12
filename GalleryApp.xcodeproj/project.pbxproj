@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F9C0A2892F58646800EC331F /* DITranquillity in Frameworks */ = {isa = PBXBuildFile; productRef = F9C0A2882F58646800EC331F /* DITranquillity */; };
 		F9C0A2AA2F58976F00EC331F /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = F9C0A2A92F58976F00EC331F /* SnapKit */; };
+		F9EBBFA12F63262000225D2D /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = F9EBBFA02F63262000225D2D /* Lottie */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,6 +67,7 @@
 			files = (
 				F9C0A2892F58646800EC331F /* DITranquillity in Frameworks */,
 				F9C0A2AA2F58976F00EC331F /* SnapKit in Frameworks */,
+				F9EBBFA12F63262000225D2D /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,6 +138,7 @@
 			packageProductDependencies = (
 				F9C0A2882F58646800EC331F /* DITranquillity */,
 				F9C0A2A92F58976F00EC331F /* SnapKit */,
+				F9EBBFA02F63262000225D2D /* Lottie */,
 			);
 			productName = GalleryApp;
 			productReference = F9C0A0E52F584B6C00EC331F /* GalleryApp.app */;
@@ -173,6 +176,7 @@
 				F9C0A2872F58646800EC331F /* XCRemoteSwiftPackageReference "DITranquillity" */,
 				F9C0A2A82F58976F00EC331F /* XCRemoteSwiftPackageReference "SnapKit" */,
 				F925BDDB2F62FFF1009C6473 /* XCRemoteSwiftPackageReference "SwiftLint" */,
+				F9EBBF9F2F63262000225D2D /* XCRemoteSwiftPackageReference "lottie-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F9C0A0E62F584B6C00EC331F /* Products */;
@@ -548,6 +552,14 @@
 				version = 5.7.1;
 			};
 		};
+		F9EBBF9F2F63262000225D2D /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.6.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -560,6 +572,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F9C0A2A82F58976F00EC331F /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		F9EBBFA02F63262000225D2D /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F9EBBF9F2F63262000225D2D /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -140,12 +140,12 @@ private extension FavouriteImageGalleryViewController {
     }
     
     func configureFooterView(_ footer: UICollectionViewListCell, isEmpty: Bool) {
-         var config = footer.defaultContentConfiguration()
-         config.text = isEmpty ? "Нет любимых картинок" : ""
-         config.textProperties.alignment = .center
-         config.textProperties.color = .secondaryLabel
-         footer.contentConfiguration = config
-     }
+        var config = footer.defaultContentConfiguration()
+        config.text = isEmpty ? "Нет любимых картинок" : ""
+        config.textProperties.alignment = .center
+        config.textProperties.color = .secondaryLabel
+        footer.contentConfiguration = config
+    }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate

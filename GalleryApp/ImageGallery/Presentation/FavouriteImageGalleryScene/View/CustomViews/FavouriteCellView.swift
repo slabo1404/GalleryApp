@@ -26,6 +26,7 @@ struct FavouriteCellView: View {
                 Color(uiColor: .systemGray6)
             }
         }
+        .aspectRatio(16/9, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .padding(.horizontal, 8)
         .padding(.vertical, 2)

@@ -112,7 +112,7 @@ private extension ImageDetailViewController {
         }
         
         closeButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(80)
+            make.top.equalToSuperview().offset(68)
             make.trailing.equalToSuperview().offset(-24)
             make.width.height.equalTo(32)
         }
