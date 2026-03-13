@@ -201,12 +201,12 @@ extension ImageGalleryViewController: ImageTransitionDataSource {
     func finalImageFrameForItem(at index: Int) -> CGRect {
         let indexPath = IndexPath(item: index, section: 0)
         
-        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
-        collectionView.layoutIfNeeded()
-        
         guard let cell = collectionView.cellForItem(at: indexPath) else {
             return .zero
         }
+        
+        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        collectionView.layoutIfNeeded()
         
         return cell.convert(cell.contentView.frame, to: nil)
     }

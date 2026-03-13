@@ -19,6 +19,7 @@ extension PhotoEntity {
         setValue(photo.altDescription, forKey: "altDescription")
         setValue(photo.imageUrl, forKey: "imageUrl")
         setValue(photo.imageData, forKey: "imageData")
+        setValue(photo.isLiked, forKey: "isLiked")
     }
 }
 
@@ -31,7 +32,8 @@ extension PhotoEntity: DomainMappable {
             description: descr,
             altDescription: altDescription,
             imageUrl: imageUrl,
-            imageData: imageData
+            imageData: imageData,
+            isLiked: isLiked
         )
     }
 }

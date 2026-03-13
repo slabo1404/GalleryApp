@@ -6,6 +6,7 @@
 //
 
 import CoreData
+import DITranquillity
 import SnapKit
 import SwiftUI
 import UIKit
@@ -95,8 +96,11 @@ private extension FavouriteImageGalleryViewController {
             cell.selectedBackgroundView = UIView()
             
             cell.contentConfiguration = UIHostingConfiguration {
-                FavouriteCellView(imageData: photo.imageData)
+                FavouriteCellView(imageData: photo.imageData) { [weak self] in
+                    self?.showImageDeatailScene(with: photo)
+                }
             }
+            .margins(.all, 0)
         }
         
         let footerRegistration = UICollectionView.SupplementaryRegistration<UICollectionViewListCell>(
@@ -146,6 +150,19 @@ private extension FavouriteImageGalleryViewController {
         config.textProperties.color = .secondaryLabel
         footer.contentConfiguration = config
     }
+    
+    private func showImageDeatailScene(with photo: Photo) {
+        var imageDetailViewModel: IImageDetailViewModel = AppDependencyContainer.container.resolve()
+        imageDetailViewModel.photos = dataSource.snapshot().itemIdentifiers
+        imageDetailViewModel.selectedPhotoId = photo.id
+        
+        let imageDetailViewController = ImageDetailViewController(
+            viewModel: imageDetailViewModel,
+            dataSource: self
+        )
+        
+        present(imageDetailViewController, animated: true)
+    }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
@@ -169,5 +186,70 @@ extension FavouriteImageGalleryViewController: NSFetchedResultsControllerDelegat
                 self?.configureFooterView(footerView, isEmpty: photos.isEmpty)
             }
         }
+    }
+}
+
+// MARK: - ImageTransitionDelegate
+
+extension FavouriteImageGalleryViewController: ImageTransitionDataSource {
+    func startImageFrameForItem(at index: Int) -> CGRect {
+        let indexPath = IndexPath(item: index, section: 0)
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return .zero
+        }
+        
+        let cellFrame = cell.convert(cell.contentView.frame, to: nil)
+        
+        let horizontalPadding: CGFloat = 16
+        let verticalPadding: CGFloat = 8
+        
+        let imageFrame = cellFrame.inset(by: UIEdgeInsets(
+            top: verticalPadding,
+            left: horizontalPadding,
+            bottom: verticalPadding,
+            right: horizontalPadding
+        ))
+        
+        return imageFrame
+    }
+    
+    func finalImageFrameForItem(at index: Int) -> CGRect {
+        let indexPath = IndexPath(item: index, section: 0)
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) else {
+            return .zero
+        }
+        
+        collectionView.scrollToItem(at: indexPath, at: .centeredVertically, animated: false)
+        collectionView.layoutIfNeeded()
+        
+        let cellFrame = cell.convert(cell.contentView.frame, to: nil)
+        
+        let horizontalPadding: CGFloat = 16
+        let verticalPadding: CGFloat = 8
+        
+        let imageFrame = cellFrame.inset(by: UIEdgeInsets(
+            top: verticalPadding,
+            left: horizontalPadding,
+            bottom: verticalPadding,
+            right: horizontalPadding
+        ))
+        
+        return imageFrame
+    }
+    
+    func imageForItem(at index: Int) -> UIImage? {
+        let photos = dataSource.snapshot().itemIdentifiers
+        
+        if index < photos.count {
+            let photo = photos[index]
+            
+            if let imageData = photo.imageData {
+                return UIImage(data: imageData)
+            }
+        }
+        
+        return nil
     }
 }

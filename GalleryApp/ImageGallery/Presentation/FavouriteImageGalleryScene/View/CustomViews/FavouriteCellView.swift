@@ -8,27 +8,37 @@
 import SwiftUI
 
 struct FavouriteCellView: View {
-    var imageData: Data?
+    let imageData: Data?
+    let onTapped: () -> Void
     
-    private var uiImage: UIImage? {
-        guard let imageData else { return nil }
-        return UIImage(data: imageData)
+    private let uiImage: UIImage?
+    
+    init(imageData: Data?, onTapped: @escaping () -> Void) {
+        self.imageData = imageData
+        self.onTapped = onTapped
+        self.uiImage = imageData.flatMap(UIImage.init)
     }
     
     var body: some View {
-        Group {
-            if let uiImage {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-            } else {
-                Color(uiColor: .systemGray6)
-            }
+        Button(action: onTapped) {
+            Color.clear
+                .aspectRatio(16/9, contentMode: .fit)
+                .overlay(contentOverlay)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .aspectRatio(16/9, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal, 8)
-        .padding(.vertical, 2)
+        .buttonStyle(ScaleButtonStyle())
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+    
+    @ViewBuilder
+    private var contentOverlay: some View {
+        if let uiImage {
+            Image(uiImage: uiImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+        } else {
+            Color(uiColor: .systemGray6)
+        }
     }
 }

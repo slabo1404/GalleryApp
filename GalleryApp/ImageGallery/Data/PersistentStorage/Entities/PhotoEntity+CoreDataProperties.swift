@@ -24,6 +24,7 @@ extension PhotoEntity {
     @NSManaged nonisolated public var imageUrl: String
     @NSManaged nonisolated public var slug: String
     @NSManaged nonisolated public var imageData: Data?
+    @NSManaged nonisolated public var isLiked: Bool
 
 }
 
