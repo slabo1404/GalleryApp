@@ -12,9 +12,11 @@ import Foundation
 protocol IImageGalleryViewModelOutput {
     var uniquePhotos: [Photo] { get }
     var photosPublisher: AnyPublisher<[Photo], Never> { get }
+    var errorMessagePublisher: AnyPublisher<String?, Never> { get }
 }
 
 protocol IImageGalleryViewModelInput {
+    func fetchPhotos() async throws
     func fetchPhotoBatch()
     func prefetchImages(at indexes: [Int])
     func cancelPrefetchImages(at indexes: [Int])
@@ -25,6 +27,7 @@ protocol IImageGalleryViewModel: IImageGalleryViewModelInput, IImageGalleryViewM
 final class ImageGalleryViewModel: IImageGalleryViewModel {
     private var photosSubject = PassthroughSubject<[Photo], Never>()
     private var updatedLikePhotoSubject = PassthroughSubject<Photo, Never>()
+    private var errorMessageSubject = PassthroughSubject<String?, Never>()
     
     private var photos: [Photo] = []
     private var batchIndex = 0
@@ -41,6 +44,10 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
     
     var photosPublisher: AnyPublisher<[Photo], Never> {
         photosSubject.eraseToAnyPublisher()
+    }
+    
+    var errorMessagePublisher: AnyPublisher<String?, Never> {
+        errorMessageSubject.eraseToAnyPublisher()
     }
     
     var uniquePhotos: [Photo] {
@@ -62,6 +69,17 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
         
         Task {
             try await fetchPhotos()
+        }
+    }
+    
+    func fetchPhotos() async throws {
+        do {
+            let batch = try await fetchPhotosUseCase.start(page: batchIndex, perPage: batchLimit)
+            
+            photos.append(contentsOf: batch)
+            photosSubject.send(uniquePhotos)
+        } catch let error as APIError {
+            errorMessageSubject.send(error.errorDescription)
         }
     }
     
@@ -101,21 +119,6 @@ final class ImageGalleryViewModel: IImageGalleryViewModel {
             
             photos[index] = updatedPhoto
             photosSubject.send(uniquePhotos)
-        }
-    }
-}
-
-// MARK: - Requests
-
-private extension ImageGalleryViewModel {
-    func fetchPhotos() async throws {
-        do {
-            let batch = try await fetchPhotosUseCase.start(page: batchIndex, perPage: batchLimit)
-            
-            photos.append(contentsOf: batch)
-            photosSubject.send(uniquePhotos)
-        } catch {
-            print(error.localizedDescription)
         }
     }
 }

@@ -23,7 +23,9 @@ final class FavouriteImageGalleryViewModel: IFavouriteImageGalleryViewModel {
     func deleteFavouritePhoto(photo: Photo) {
         deleteFavouritePhotoUseCase.start(id: photo.id)
         
-        NotificationCenter.default.post(name: .updateLikeStatus, object: photo, userInfo: nil)
+        var updatedPhoto = photo
+        updatedPhoto.isLiked = false
+        NotificationCenter.default.post(name: .updateLikeStatus, object: updatedPhoto, userInfo: nil)
     }
     
 }

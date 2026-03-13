@@ -142,19 +142,6 @@ private extension ImageGalleryViewController {
             )
         }
     }
-    
-    private func showImageDeatailScene(with photo: Photo) {
-        var imageDetailViewModel: IImageDetailViewModel = AppDependencyContainer.container.resolve()
-        imageDetailViewModel.photos = viewModel.uniquePhotos
-        imageDetailViewModel.selectedPhotoId = photo.id
-        
-        let imageDetailViewController = ImageDetailViewController(
-            viewModel: imageDetailViewModel,
-            dataSource: self
-        )
-        
-        present(imageDetailViewController, animated: true)
-    }
 }
 
 // MARK: - Bindings
@@ -168,6 +155,30 @@ private extension ImageGalleryViewController {
                 snapshot.appendSections([0])
                 snapshot.appendItems(photos)
                 self?.dataSource.apply(snapshot)
+                
+                self?.collectionView.backgroundView = nil
+            }
+            .store(in: &cancellable)
+        
+        viewModel.errorMessagePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] message in
+                guard let message else { return }
+                
+                if self?.viewModel.uniquePhotos.isEmpty == true {
+                    let errorView = ErrorStateView()
+                    errorView.onRetry = { [weak self] in
+                        Task {
+                            try await self?.viewModel.fetchPhotos()
+                        }
+                    }
+                    
+                    self?.collectionView.backgroundView = errorView
+                } else {
+                    self?.collectionView.backgroundView = nil
+                }
+                
+                self?.showAlertController(with: message)
             }
             .store(in: &cancellable)
     }
@@ -214,5 +225,35 @@ extension ImageGalleryViewController: ImageTransitionDataSource {
     func imageForItem(at index: Int) -> UIImage? {
         let photo = viewModel.uniquePhotos[index]
         return ImageLoader.shared.geImageFromCache(key: photo.imageUrl)
+    }
+}
+
+// MARK: - Navigation
+
+private extension ImageGalleryViewController {
+    func showImageDeatailScene(with photo: Photo) {
+        var imageDetailViewModel: IImageDetailViewModel = AppDependencyContainer.container.resolve()
+        imageDetailViewModel.photos = viewModel.uniquePhotos
+        imageDetailViewModel.selectedPhotoId = photo.id
+        
+        let imageDetailViewController = ImageDetailViewController(
+            viewModel: imageDetailViewModel,
+            dataSource: self
+        )
+        
+        present(imageDetailViewController, animated: true)
+    }
+    
+    func showAlertController(with message: String) {
+        let alert = UIAlertController(
+            title: "",
+            message: message,
+            preferredStyle: .actionSheet
+        )
+        
+        let okAction = UIAlertAction(title: "OK", style: .cancel)
+        alert.addAction(okAction)
+        
+        present(alert, animated: true)
     }
 }

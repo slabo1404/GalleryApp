@@ -107,7 +107,7 @@ private extension FavouriteImageGalleryViewController {
             elementKind: UICollectionView.elementKindSectionFooter
         ) { [weak self] footerView, _, _ in
             let isEmpty = self?.dataSource.snapshot().numberOfItems == 0
-
+            
             self?.configureFooterView(footerView, isEmpty: isEmpty)
         }
         
@@ -149,19 +149,6 @@ private extension FavouriteImageGalleryViewController {
         config.textProperties.alignment = .center
         config.textProperties.color = .secondaryLabel
         footer.contentConfiguration = config
-    }
-    
-    private func showImageDeatailScene(with photo: Photo) {
-        var imageDetailViewModel: IImageDetailViewModel = AppDependencyContainer.container.resolve()
-        imageDetailViewModel.photos = dataSource.snapshot().itemIdentifiers
-        imageDetailViewModel.selectedPhotoId = photo.id
-        
-        let imageDetailViewController = ImageDetailViewController(
-            viewModel: imageDetailViewModel,
-            dataSource: self
-        )
-        
-        present(imageDetailViewController, animated: true)
     }
 }
 
@@ -251,5 +238,22 @@ extension FavouriteImageGalleryViewController: ImageTransitionDataSource {
         }
         
         return nil
+    }
+}
+
+// MARK: - Navigation
+
+private extension FavouriteImageGalleryViewController {
+    func showImageDeatailScene(with photo: Photo) {
+        var imageDetailViewModel: IImageDetailViewModel = AppDependencyContainer.container.resolve()
+        imageDetailViewModel.photos = dataSource.snapshot().itemIdentifiers
+        imageDetailViewModel.selectedPhotoId = photo.id
+        
+        let imageDetailViewController = ImageDetailViewController(
+            viewModel: imageDetailViewModel,
+            dataSource: self
+        )
+        
+        present(imageDetailViewController, animated: true)
     }
 }
